@@ -1,0 +1,12 @@
+[package]
+name = "json_action"
+version = "0.1.0"
+authors = ["Yuri Titov <yuri@parsesoftware.com>"]
+edition = "2018"
+
+[dependencies]
+bytes = "0.4"
+byteorder = "1"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
