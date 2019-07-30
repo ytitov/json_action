@@ -66,6 +66,10 @@ where
     }
 }
 
+pub fn value_err<E: std::error::Error>(name: &str, e: E) -> Result<(), ActionError> {
+    Err(ActionError::new(name, &e.to_string()))
+}
+
 pub fn action_ok() -> Result<serde_json::Value, ActionError> {
     let v = json!({"success": true});
     Ok(v)
