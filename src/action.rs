@@ -66,7 +66,7 @@ where
     }
 }
 
-pub fn value_err<E: std::error::Error>(name: &str, e: E) -> Result<(), ActionError> {
+pub fn value_err<E: std::error::Error>(name: &str, e: E) -> Result<serde_json::Value, ActionError> {
     Err(ActionError::new(name, &e.to_string()))
 }
 
