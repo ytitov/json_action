@@ -72,3 +72,10 @@ impl From<std::io::Error> for ActionError {
         ActionError::new("io::Error", &error.to_string())
     }
 }
+
+impl From<Box<std::error::Error>> for ActionError {
+    fn from(error: Box<std::error::Error>) -> ActionError {
+        // TODO: get the cause to display better
+        ActionError::new("Boxed::Error", &error.to_string())
+    }
+}
