@@ -55,6 +55,12 @@ impl ToActionError for (String, String) {
     }
 }
 
+impl ToActionError for std::error::Error {
+    fn to_action_error(&self) -> ActionError {
+        ActionError::new("std::error::Error", &self.to_string())
+    }
+}
+
 impl From<JsonError> for ActionError {
     fn from(error: JsonError) -> Self {
         ActionError::new("JsonError", &error.to_string())
