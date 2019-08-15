@@ -43,6 +43,7 @@ pub struct ActionReply {
     pub errors: Vec<ActionError>,
 }
 
+/*
 pub fn try_action<V, E>(v: Result<V, E>) -> Result<serde_json::Value, ActionError>
 where
     V: Serialize,
@@ -56,6 +57,7 @@ where
         Err(e) => Err(ActionError::from(("TryAction", format!("{}", e).as_ref()))),
     }
 }
+*/
 
 pub fn value_ok<V>(v: V) -> Result<serde_json::Value, Box<std::error::Error>>
 where
