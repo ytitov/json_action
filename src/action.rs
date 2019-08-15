@@ -8,7 +8,8 @@ use serde::de::Deserialize;
 
 use crate::error::{ActionError, ToActionError};
 
-pub type ActionHandler<R> = Fn(&R, &Action) -> Result<serde_json::Value, ActionError> + 'static;
+pub type ActionHandler<R> =
+    Fn(&R, &Action) -> Result<serde_json::Value, Box<std::error::Error>> + 'static;
 pub type ManagerInitHandler<R> = Fn(&R) -> Result<(), ActionError>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -268,7 +269,7 @@ impl<R> Manager<R> {
     /// identical to action but this is syntactically better to use a little bit
     pub fn on<T>(&mut self, name: &str, f: T)
     where
-        T: Fn(&R, &Action) -> Result<serde_json::Value, ActionError> + 'static,
+        T: Fn(&R, &Action) -> Result<serde_json::Value, Box<std::error::Error>> + 'static,
     {
         if self.actions.contains_key(name) {
             println!(
@@ -302,7 +303,10 @@ impl<R> Manager<R> {
                         action.set_result(serde_json::value::to_value(&v)
                                           .expect("Fatal error, some function returned something that can't be converted to a json value"))
                     }
-                    Err(e) => action.set_error(e),
+                    Err(e) => action.set_error(ActionError::from((
+                        "RunAction".to_owned(),
+                        format!("{}", e),
+                    ))),
                 };
             }
             _ => {
@@ -326,7 +330,10 @@ impl<R> Manager<R> {
                             action.set_result(serde_json::value::to_value(&v)
                                               .expect("Fatal error, some function returned something that can't be converted to a json value"))
                         }
-                        Err(e) => action.set_error(e),
+                        Err(e) => action.set_error(ActionError::from((
+                            "RunAction".to_owned(),
+                            format!("{}", e),
+                        ))),
                     };
                 };
                 if let Some(gen_resource) = &self.gen_resource {
