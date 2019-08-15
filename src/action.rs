@@ -70,7 +70,7 @@ pub fn value_err<E: std::error::Error>(name: &str, e: E) -> Result<serde_json::V
     Err(ActionError::new(name, &e.to_string()))
 }
 
-pub fn action_ok() -> Result<serde_json::Value, ActionError> {
+pub fn action_ok() -> Result<serde_json::Value, Box<std::error::Error>> {
     let v = json!({"success": true});
     Ok(v)
 }
