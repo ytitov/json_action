@@ -33,34 +33,6 @@ impl error::Error for ActionError {
     }
 }
 
-pub trait ToActionError {
-    fn to_action_error(&self) -> ActionError;
-}
-
-impl ToActionError for serde_json::Error {
-    fn to_action_error(&self) -> ActionError {
-        ActionError::new("SerdeJson", &self.to_string())
-    }
-}
-
-impl ToActionError for ActionError {
-    fn to_action_error(&self) -> ActionError {
-        ActionError::new(&self.code, &self.message)
-    }
-}
-
-impl ToActionError for (String, String) {
-    fn to_action_error(&self) -> ActionError {
-        ActionError::new(&self.0, &self.1)
-    }
-}
-
-impl ToActionError for std::error::Error {
-    fn to_action_error(&self) -> ActionError {
-        ActionError::new("std::error::Error", &self.to_string())
-    }
-}
-
 impl From<JsonError> for ActionError {
     fn from(error: JsonError) -> Self {
         ActionError::new("JsonError", &error.to_string())
@@ -70,6 +42,12 @@ impl From<JsonError> for ActionError {
 impl From<(String, String)> for ActionError {
     fn from((a, b): (String, String)) -> ActionError {
         ActionError::new(&a, &b)
+    }
+}
+
+impl From<(&str, &str)> for ActionError {
+    fn from((a, b): (&str, &str)) -> ActionError {
+        ActionError::new(a, b)
     }
 }
 

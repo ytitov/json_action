@@ -6,7 +6,7 @@ use std::collections::HashMap;
 //use serde::de::DeserializeOwned;
 use serde::de::Deserialize;
 
-use crate::error::{ActionError, ToActionError};
+use crate::error::ActionError;
 
 pub type ActionHandler<R> =
     Fn(&R, &Action) -> Result<serde_json::Value, Box<std::error::Error>> + 'static;
@@ -46,25 +46,22 @@ pub struct ActionReply {
 pub fn try_action<V, E>(v: Result<V, E>) -> Result<serde_json::Value, ActionError>
 where
     V: Serialize,
-    E: ToActionError,
+    E: std::error::Error,
 {
     match v {
         Ok(val) => {
             let v = serde_json::to_value(&val).expect("try_action, serde_json::to_value blew up");
             Ok(v)
         }
-        Err(e) => Err(e.to_action_error()),
+        Err(e) => Err(ActionError::from(("TryAction", format!("{}", e).as_ref()))),
     }
 }
 
-pub fn value_ok<V>(v: V) -> Result<serde_json::Value, ActionError>
+pub fn value_ok<V>(v: V) -> Result<serde_json::Value, Box<std::error::Error>>
 where
     V: Serialize,
 {
-    match serde_json::to_value(&v) {
-        Ok(val) => Ok(val),
-        Err(e) => Err(ActionError::new("ToValue", &e.to_string())),
-    }
+    Ok(serde_json::to_value(&v)?)
 }
 
 pub fn value_err<E: std::error::Error>(name: &str, e: E) -> Result<serde_json::Value, ActionError> {
