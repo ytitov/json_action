@@ -10,7 +10,7 @@ use crate::error::{ActionError, ToActionError};
 
 pub type ActionHandler<R> =
     Fn(&R, &Action) -> Result<serde_json::Value, Box<std::error::Error>> + 'static;
-pub type ManagerInitHandler<R> = Fn(&R) -> Result<(), ActionError>;
+pub type ManagerInitHandler<R> = Fn(&R) -> Result<(), Box<std::error::Error>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Action {
