@@ -9,8 +9,8 @@ use serde::de::Deserialize;
 use crate::error::ActionError;
 
 pub type ActionHandler<R> =
-    Fn(&R, &Action) -> Result<serde_json::Value, Box<std::error::Error>> + 'static;
-pub type ManagerInitHandler<R> = Fn(&R) -> Result<(), Box<std::error::Error>>;
+    dyn Fn(&R, &Action) -> Result<serde_json::Value, Box<dyn std::error::Error>> + 'static;
+pub type ManagerInitHandler<R> = dyn Fn(&R) -> Result<(), Box<dyn std::error::Error>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Action {
@@ -37,7 +37,7 @@ pub struct ActionReply {
     pub id: u64,
     //#[serde(borrow)]
     pub name: String,
-    pub payload: HashMap<String, Value>,
+    //pub payload: HashMap<String, Value>,
     pub result: Option<Value>,
     // this should always be available in the action
     pub errors: Vec<ActionError>,
@@ -59,7 +59,7 @@ where
 }
 */
 
-pub fn value_ok<V>(v: V) -> Result<serde_json::Value, Box<std::error::Error>>
+pub fn value_ok<V>(v: V) -> Result<serde_json::Value, Box<dyn std::error::Error>>
 where
     V: Serialize,
 {
@@ -70,7 +70,7 @@ pub fn value_err<E: std::error::Error>(name: &str, e: E) -> Result<serde_json::V
     Err(ActionError::new(name, &e.to_string()))
 }
 
-pub fn action_ok() -> Result<serde_json::Value, Box<std::error::Error>> {
+pub fn action_ok() -> Result<serde_json::Value, Box<dyn std::error::Error>> {
     let v = json!({"success": true});
     Ok(v)
 }
@@ -154,7 +154,6 @@ impl Action {
         ActionReply {
             id: self.id,
             name: self.name,
-            payload: self.payload,
             result: self.result,
             errors,
         }
@@ -204,7 +203,7 @@ pub struct Manager<R> {
     name: String,
     actions: HashMap<String, Box<ActionHandler<R>>>,
     resource: Option<R>,
-    gen_resource: Option<Box<Fn() -> R>>,
+    gen_resource: Option<Box<dyn Fn() -> R>>,
 }
 
 impl<R> Manager<R> {
@@ -268,7 +267,7 @@ impl<R> Manager<R> {
     /// identical to action but this is syntactically better to use a little bit
     pub fn on<T>(&mut self, name: &str, f: T)
     where
-        T: Fn(&R, &Action) -> Result<serde_json::Value, Box<std::error::Error>> + 'static,
+        T: Fn(&R, &Action) -> Result<serde_json::Value, Box<dyn std::error::Error>> + 'static,
     {
         if self.actions.contains_key(name) {
             println!(
