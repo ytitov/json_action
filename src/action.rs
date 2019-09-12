@@ -167,8 +167,8 @@ pub struct ManagerFut<R> {
     // I don't know...
     //actions: HashMap<String, Box<Fn(&R, &Action) -> Result<serde_json::Value, ActionError>>>,
     name: String,
-    actions: HashMap<String, Box<Fn(&R, &Action) -> Result<(), ActionError> + 'static>>,
-    resource: R,
+    actions: HashMap<String, Box<dyn Fn(&R, &Action) -> Result<(), ActionError> + 'static>>,
+    pub resource: R,
 }
 
 impl<R> ManagerFut<R> {

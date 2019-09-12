@@ -1,6 +1,6 @@
 [package]
 name = "json_action"
-version = "0.0.1"
+version = "0.0.5.alpha"
 authors = ["Yuri Titov <yuri@parsesoftware.com>"]
 edition = "2018"
 
